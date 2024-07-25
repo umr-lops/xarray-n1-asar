@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = [
-    "safe_asar",
-    "safe_asar.*",
+    "n1_asar",
+    "n1_asar.*",
 ]
 [project]
 name = "xarray-safe-asar"
@@ -41,7 +41,7 @@ changelog = "https://github.com/umr-lops/xarray-safe-asar/blob/master/changelog.
 homepage = "https://github.com/umr-lops/xarray-safe-asar"
 
 [tool.setuptools]
-package-dir = {"" = "safe_asar"}
+package-dir = {"" = "n1_asar"}
 
 [tool.setuptools.package-data]
 "*" = ["*.*"]
@@ -65,5 +65,5 @@ warn_no_return = true
 module = "tests.*"
 allow_untyped_defs = true
 disable_error_code = "attr-defined"
-known_first_party = "safe_asar"
+known_first_party = "n1_asar"
 

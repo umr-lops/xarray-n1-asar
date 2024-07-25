@@ -12,7 +12,7 @@ To install xarray-safe-asar, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install safe_asar
+    $ pip install n1_asar
 
 This is the preferred method to install xarray-safe-asar, as it will always install the most recent stable release.
 
