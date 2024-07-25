@@ -1,25 +1,38 @@
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
-[tool.setuptools.packages.find]
-include = [
-    "n1_asar",
-    "n1_asar.*",
-]
 [project]
 name = "xarray-safe-asar"
-version = "2024.07.04"
 description = "Python lib to read ASAR SLC product from ENVISAT mission (2002-2012)."
-readme = "README.rst"
+readme = "README.md"
 authors = [
   {name = "Antoine GROUAZEL", email = "antoine.grouazel@ifremer.fr"}
 ]
 maintainers = [
   {name = "Antoine GROUAZEL", email = "antoine.grouazel@ifremer.fr"}
 ]
-classifiers = [
-
+keywords = [
+  "xarray",
+  "earth-observation",
+  "remote-sensing",
+  "satellite-imagery",
+  "asar",
+  "envisat",
+  "sar",
+  "synthetic-aperture-radar",
 ]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+]
+dynamic = ["version"]
 license = {text = "MIT license"}
 dependencies = [
     'xarray'
@@ -41,12 +54,20 @@ changelog = "https://github.com/umr-lops/xarray-safe-asar/blob/master/changelog.
 homepage = "https://github.com/umr-lops/xarray-safe-asar"
 
 [tool.setuptools]
-package-dir = {"" = "n1_asar"}
+packages = ["n1_asar"]
+
+[tool.setuptools_scm]
+fallback_version = "999"
 
 [tool.setuptools.package-data]
 "*" = ["*.*"]
 
+[tool.black]
+line-length = 100
 
+[tool.coverage.run]
+source = ["ceos_alos2"]
+branch = true
 
 
 # Mypy
