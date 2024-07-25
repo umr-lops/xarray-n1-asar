@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = safe_asar
+SPHINXPROJ    = n1_asar
 SOURCEDIR     = .
 BUILDDIR      = _build
 
