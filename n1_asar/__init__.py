@@ -1,5 +1,10 @@
 """Top-level package for xarray-safe-asar."""
 
-__author__ = """Antoine GROUAZEL"""
-__email__ = 'antoine.grouazel@ifremer.fr'
-__version__ = '2024.07.04'
+from importlib.metadata import version
+
+import n1_asar  # noqa: F401
+
+try:
+    __version__ = version("xarray-safe-asar")
+except Exception:
+    __version__ = "999"

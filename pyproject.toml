@@ -1,6 +1,3 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
 [project]
 name = "xarray-safe-asar"
 description = "Python lib to read ASAR SLC product from ENVISAT mission (2002-2012)."
@@ -52,6 +49,10 @@ dev = [
 bugs = "https://github.com/umr-lops/xarray-safe-asar/issues"
 changelog = "https://github.com/umr-lops/xarray-safe-asar/blob/master/changelog.md"
 homepage = "https://github.com/umr-lops/xarray-safe-asar"
+
+[build-system]
+requires = ["setuptools>=64.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["n1_asar"]
