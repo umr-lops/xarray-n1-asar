@@ -19,61 +19,70 @@ def display_cross_spectra(asa_wvi_1p_dt, kmin=2*np.pi/1000, kmax=0.07, savepath=
         None
     """
     asa_cross_spectra = asa_wvi_1p_dt['cross_spectra']
-    asa_cross_spectra = asa_cross_spectra.assign_coords(direction=('direction', np.radians(np.arange(0, 180, 10))))
     
     # get first and last wavelength values
     l0 = float(asa_wvi_1p_dt.attrs['first_wl_bin'][:-3])
     lm = float(asa_wvi_1p_dt.attrs['last_wl_bin'][:-3])
     N = int(asa_wvi_1p_dt.attrs['num_wl_bins'])
-    wavelength = np.array([l0 / ((l0 / lm) ** (2 * m / (2*N-1))) for m in range(N-1)] + [lm])
-    str_wavelength = np.array([f'{w:.1f}' for w in wavelength])
     
+    wavelength = np.array([l0 / ((l0 / lm) ** (2 * m / (2*N - 1))) for m in range(N)])
     asa_cross_spectra = asa_cross_spectra.assign_coords(wavenumber=('wavelength', 2*np.pi/wavelength))
+    asa_cross_spectra = asa_cross_spectra.assign_coords(direction=('direction', np.radians(np.arange(0, 180, 10))))
+
+    spectra = get_polar_spectra(asa_cross_spectra)
+
+    full_spectra = symmetrize_polar_spectra(spectra)
+
+    # Create figure with two polar subplots
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5), subplot_kw={'projection': 'polar'}, constrained_layout=True)
     
-    # rescale the real_spectra and imag_spectra
-    real_spectra = asa_cross_spectra['real_spectra'].T / 255 * (asa_cross_spectra['max_real'] - asa_cross_spectra['min_real']) + asa_cross_spectra['min_real']
-    imag_spectra = asa_cross_spectra['imag_spectra'].T / 255 * (asa_cross_spectra['max_imag'] - asa_cross_spectra['min_imag']) + asa_cross_spectra['min_imag']
-    spectra = real_spectra + 1j*imag_spectra
-    
-    # concatenate half spectra and its conjugate
-    sym_spectra = spectra.copy()
-    sym_spectra = np.conj(sym_spectra.assign_coords(direction = np.pi + spectra.direction))
-    full_spectra = xr.concat([spectra, sym_spectra], dim='direction')
-    
-    # create a figure with two polar subplots
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6), subplot_kw={'projection': 'polar'})
-    
-    # create a brighter plasma colormap for real spectra
+    # Create a brighter plasma colormap for real spectra
     plasma_bright = ListedColormap(np.clip(plt.cm.plasma(np.linspace(0.15, 1, 256)), 0.0, 1.0))
     
-    # plot real spectra on the first subplot
+    # Plot real spectra on the first subplot
     c0 = full_spectra.real.plot(ax=axes[0], cmap=plasma_bright, y='wavenumber',
                                 vmin=full_spectra.real.min(), vmax=full_spectra.real.max(),
                                 add_colorbar=False)
-    axes[0].set_title("Real Spectra")
+    axes[0].set_title("Real Spectrum", fontsize=12)
     axes[0].set(xlabel=None, ylabel=None)
     axes[0].set_theta_zero_location('N')  # set 0° to be at the top
-    axes[0].set_xticks(np.arange(0, 2*np.pi, np.pi/4))
-    axes[0].set_rticks([2*np.pi/w for w in [400,200,100]], ['400m','200m','100m'])
+    # axes[0].set_theta_direction(-1)
+    axes[0].set_xticks(np.arange(0, 2 * np.pi, np.pi / 4))
+    axes[0].set_rticks([2 * np.pi / w for w in [400, 200, 100]], ['400m', '200m', '100m'])
     axes[0].set_rlim(kmin, kmax)
     axes[0].grid(linestyle='--')
-    fig.colorbar(c0, ax=axes[0], pad=0.1)
     
-    # plot imaginary spectra on the second subplot
+    # Add colorbar for real spectrum
+    cbar0 = fig.colorbar(c0, ax=axes[0], pad=0.1)
+    cbar0.ax.tick_params(labelsize=10)
+
+    # Plot imaginary spectra on the second subplot
     c1 = full_spectra.imag.plot(ax=axes[1], cmap='PuOr', y='wavenumber',
                                 vmin=full_spectra.imag.min(), vmax=full_spectra.imag.max(),
                                 add_colorbar=False)
-    axes[1].set_title("Imaginary Spectra")
+    axes[1].set_title("Imaginary Spectrum", fontsize=12)
     axes[1].set(xlabel=None, ylabel=None)
     axes[1].set_theta_zero_location('N')  # set 0° to be at the top
-    axes[1].set_xticks(np.arange(0, 2*np.pi, np.pi/4))
-    axes[1].set_rticks([2*np.pi/w for w in [400,200,100]], ['400m','200m','100m'])
+    # axes[1].set_theta_direction(-1)
+    axes[1].set_xticks(np.arange(0, 2 * np.pi, np.pi / 4))
+    axes[1].set_rticks([2 * np.pi / w for w in [400, 200, 100]], ['400m', '200m', '100m'])
     axes[1].set_rlim(kmin, kmax)
     axes[1].grid(linestyle='--')
-    fig.colorbar(c1, ax=axes[1],  pad=0.1)
-
+    
+    # Add colorbar for imaginary spectrum
+    cbar1 = fig.colorbar(c1, ax=axes[1], pad=0.1)
+    cbar1.ax.tick_params(labelsize=10)
+    
+    # Add additional information using plt.text in the first subplot
+    az_cutoff = asa_cross_spectra['az_cutoff']
+    lon, lat = asa_wvi_1p_dt['geolocation_ads']['center_long'], asa_wvi_1p_dt['geolocation_ads']['center_lat']
+    info_text = f"Longitude: {lon:.2f}° \nLatitude: {lat:.2f}° \nAz. cut-off: {az_cutoff:.2f}m"
+    axes[0].text(0.00, 0.05, info_text, transform=axes[0].transAxes, fontsize=10,
+                 verticalalignment='top', bbox=dict(facecolor='white', alpha=0.8, boxstyle="round,pad=0.5"))
+    
+    # Save or display the figure
     if savepath:
-        plt.savefig(savepath)
+        plt.savefig(savepath, dpi=300)
         plt.close()
     else:
         plt.show()
@@ -94,11 +103,21 @@ def display_digital_numbers(asa_wvi_1p_dt, savepath=None):
     DN = DN.assign_coords(range_ = DN['sample']*asa_wvi_1p_dt['processing_parameters'].ds['ground_res'])
     DN = DN.assign_coords(azimuth_ = DN['line']*asa_wvi_1p_dt['processing_parameters'].ds['imagette_az_res'])
 
-    c = DN.plot(cmap='gray', vmin=0, x='range_',y='azimuth_', add_colorbar=False)
-    plt.colorbar(c, label=r'$log_{10}(|DN|^2)$')
-    plt.xlabel('ground range (m)'), plt.ylabel('azimuth (m)')
+    # Enable constrained layout to automatically adjust colorbar size
+    fig, ax = plt.subplots()
+    
+    # Plot data without colorbar
+    c = DN.plot(ax=ax, cmap='gray', vmin=0, x='range_', y='azimuth_', add_colorbar=False)
+    
+    # Set labels and aspect ratio
+    ax.set_xlabel('ground range (m)')
+    ax.set_ylabel('azimuth (m)')
     plt.axis('scaled')
 
+    # Add colorbar
+    cax = fig.add_axes([ax.get_position().x1+0.01,ax.get_position().y0, 0.02, ax.get_position().height])
+    plt.colorbar(c, cax=cax, label=r'$log_{10}(|DN|^2)$')
+    
     if savepath:
         plt.savefig(savepath)
         plt.close()
@@ -146,3 +165,37 @@ def display_map(reader, i, dx=10, savepath=None):
         plt.close()
     else:
         plt.show()
+
+
+def get_polar_spectra(asa_cross_spectra):
+    """
+    Convert and rescale real and imaginary parts of cross-spectra to a complex polar spectrum.
+    
+    Args:
+        asa_cross_spectra (xarray.Dataset): 'cross_spectra' dataset of the ASA_WVI_1P_Reader.
+    
+    Returns:
+        (xarray.DataArray): The complex polar spectrum, combining the rescaled real and imaginary parts.
+    """
+    real_spectra = asa_cross_spectra['real_spectra'].T / 255 * (asa_cross_spectra['max_real'] - asa_cross_spectra['min_real']) + asa_cross_spectra['min_real']
+    imag_spectra = asa_cross_spectra['imag_spectra'].T / 255 * (asa_cross_spectra['max_imag'] - asa_cross_spectra['min_imag']) + asa_cross_spectra['min_imag']
+    spectra = real_spectra + 1j*imag_spectra
+        
+    return spectra
+
+
+def symmetrize_polar_spectra(spectra):
+    """
+    Symmetrize a polar spectrum by adding its complex conjugate at a 180° phase shift.
+    
+    Args:
+        spectra (xarray.DataArray): The input polar spectrum.
+    
+    Returns:
+        xarray.DataArray: The symmetrized polar spectrum.
+    """
+    sym_spectra = spectra.copy()
+    sym_spectra = np.conj(sym_spectra.assign_coords(direction = spectra.direction + np.pi))
+    full_spectra = xr.concat([spectra, sym_spectra], dim='direction')
+    
+    return full_spectra

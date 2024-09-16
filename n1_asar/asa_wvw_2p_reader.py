@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 import datatree as dtt
 
-from asa_wv_reader import ASA_WV_Reader
+from n1_asar.asa_wv_reader import ASA_WV_Reader
 
 class ASA_WVW_2P_Reader(ASA_WV_Reader):
     """
