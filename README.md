@@ -1,4 +1,3 @@
-================
 xarray-n1-asar
 ================
 
@@ -14,17 +13,17 @@ Installation
 1. Set up a virtual environment.
 
 2. Clone the repository:
-  ```bash
-  git clone https://github.com/umr-lops/xarray-n1-asar.git
-  ```
+```bash
+git clone https://github.com/umr-lops/xarray-n1-asar.git
+```
 3. Navigate to the project directory:
-  ```bash
-  cd xarray-n1-asar
-  ```
+```bash
+cd xarray-n1-asar
+```
 4. Install the library:
-  ```bash
-  pip install -e .
-  ```
+```bash
+pip install -e .
+```
 
 Usage
 --------
