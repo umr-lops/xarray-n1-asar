@@ -10,19 +10,8 @@ Currently, the library supports the ASA_WVI_1P and ASA_WVW_2P file formats.
 
 Installation
 --------
-1. Set up a virtual environment.
-
-2. Clone the repository:
 ```bash
-git clone https://github.com/umr-lops/xarray-n1-asar.git
-```
-3. Navigate to the project directory:
-```bash
-cd xarray-n1-asar
-```
-4. Install the library:
-```bash
-pip install -e .
+pip install git+https://github.com/umr-lops/xarray-n1-asar.git
 ```
 
 Usage
