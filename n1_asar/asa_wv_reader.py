@@ -6,7 +6,6 @@ import struct
 import numpy as np
 import xarray as xr
 import pandas as pd
-import datatree as dtt
 
 from datetime import datetime, timedelta
 
@@ -24,7 +23,7 @@ class ASA_WV_Reader:
         sph (dict): Specific Product Header.
         dsd_df (pandas.DataFrame): The Data Set Descriptor DataFrame.
         geolocation_ads_df (pandas.DataFrame): The geolocation ADS DataFrame.
-        datatree (dtt.DataTree or None): The DataTree object corresponding to the imagette index, if provided.
+        datatree (xr.DataTree or None): The DataTree object corresponding to the imagette index, if provided.
 
     """
     def __init__(self, path):
@@ -658,7 +657,7 @@ class ASA_WV_Reader:
         raw_processing_parameters_ads)
         
         processing_parameters_dict = {
-            "/": xr.Dataset({
+            "/main_parameters": xr.Dataset({
                 'first_zero_doppler_time': ([], self.convert_mjd(data[:3]),
                                             {'long_name': 'First Zero Doppler Azimuth time of MDS which this data set describes', 
                                              'description': 'Time of first range line in the MDS described by this data set.'
@@ -1728,6 +1727,6 @@ class ASA_WV_Reader:
                 })
             })
         }
-        processing_parameters_ds = dtt.DataTree.from_dict(processing_parameters_dict)
+        processing_parameters_ds = xr.DataTree.from_dict(processing_parameters_dict)
         
         return processing_parameters_ds
