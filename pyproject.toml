@@ -32,8 +32,7 @@ classifiers = [
 dynamic = ["version"]
 license = {text = "MIT license"}
 dependencies = [
-    'xarray',
-    'xarray-datatree',
+    'xarray>=2024.10.0',
     'numpy',
     'pandas',
     'matplotlib'

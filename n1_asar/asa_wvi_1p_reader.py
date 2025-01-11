@@ -1,7 +1,6 @@
 import struct
 import numpy as np
 import xarray as xr
-import datatree as dtt
 
 from n1_asar.asa_wv_reader import ASA_WV_Reader
 
@@ -18,7 +17,7 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
         sph (dict): Specific Product Header.
         dsd_df (pandas.DataFrame): The Data Set Descriptor DataFrame.
         geolocation_ads_df (pandas.DataFrame): The geolocation ADS DataFrame.
-        datatree (dtt.DataTree or None): The DataTree object corresponding to the imagette index, if provided.
+        datatree (xr.DataTree or None): The DataTree object corresponding to the imagette index, if provided.
         
     Example:
         reader = ASA_WVI_1P_Reader('ASA_WVI_1PNPDK20040728_185756_000000902029_00027_12606_1040.N1:WV_001')
@@ -53,7 +52,7 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
         "/processing_parameters": processing_parameters_ds
         }
 
-        datatree = dtt.DataTree.from_dict(final_dict)
+        datatree = xr.DataTree.from_dict(final_dict)
         self.set_attributes(datatree)
         datatree.attrs['platform'] = 'ENVISAT'
         
