@@ -100,8 +100,8 @@ def display_digital_numbers(asa_wvi_1p_dt, savepath=None):
         None
     """
     DN = np.log10(np.abs(asa_wvi_1p_dt['imagette']['measurement_real'] + 1j*asa_wvi_1p_dt['imagette']['measurement_imag'])**2)
-    DN = DN.assign_coords(range_ = DN['sample']*asa_wvi_1p_dt['processing_parameters'].ds['ground_res'])
-    DN = DN.assign_coords(azimuth_ = DN['line']*asa_wvi_1p_dt['processing_parameters'].ds['imagette_az_res'])
+    DN = DN.assign_coords(range_ = DN['sample']*asa_wvi_1p_dt['processing_parameters/main_parameters'].ds['ground_res'])
+    DN = DN.assign_coords(azimuth_ = DN['line']*asa_wvi_1p_dt['processing_parameters/main_parameters'].ds['imagette_az_res'])
 
     # Enable constrained layout to automatically adjust colorbar size
     fig, ax = plt.subplots()
