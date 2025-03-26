@@ -18,7 +18,7 @@ def display_cross_spectra(asa_wvi_1p_dt, kmin=2*np.pi/1000, kmax=0.07, savepath=
     Returns:
         None
     """
-    asa_cross_spectra = asa_wvi_1p_dt['cross_spectra']
+    asa_cross_spectra = asa_wvi_1p_dt['cross_spectra'].to_dataset()
     
     # get first and last wavelength values
     l0 = float(asa_wvi_1p_dt.attrs['first_wl_bin'][:-3])
