@@ -1566,12 +1566,12 @@ class ASA_WV_Reader:
                              'long_name': 'X velocity relative to Earth fixed reference frame',
                              'description': ''
                             }),
-                'y_vel': (['state_vect_time'], np.array([data[i] for i in range(337, 375, 9)]) * 1e-2,
+                'y_vel': (['state_vect_time'], np.array([data[i] for i in range(337, 375, 9)]) * 1e-5,
                             {'units': 'm/s',
                              'long_name': 'Y velocity relative to Earth fixed reference frame',
                              'description': ''
                             }),
-                'z_vel': (['state_vect_time'], np.array([data[i] for i in range(338, 375, 9)]) * 1e-2,
+                'z_vel': (['state_vect_time'], np.array([data[i] for i in range(338, 375, 9)]) * 1e-5,
                             {'units': 'm/s',
                              'long_name': 'Z velocity relative to Earth fixed reference frame',
                              'description': ''
