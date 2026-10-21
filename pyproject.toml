@@ -42,11 +42,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "coverage",  # testing
-    "mypy",  # linting
+    "mypy==2.4.0",  # linting (match .pre-commit-config.yaml rev)
     "pandas-stubs",  # mypy stubs (pandas has no py.typed)
     "pytest",  # testing
     "pytest-cov",  # testing coverage
-    "ruff",  # linting
+    "ruff==0.7.1",  # linting (match .pre-commit-config.yaml rev)
     "cartopy",  # plotting (used by figures_wvi_1p)
 ]
 
