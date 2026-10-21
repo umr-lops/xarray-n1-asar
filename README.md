@@ -1,6 +1,7 @@
 xarray-n1-asar
 ================
 
+[![codecov](https://img.shields.io/codecov/c/github/umr-lops/xarray-n1-asar)](https://app.codecov.io/gh/umr-lops/xarray-n1-asar)
 
 Python library to read ASAR SLC product from ENVISAT mission (2002-2012).
 Currently, the library supports the ASA_WVI_1P and ASA_WVW_2P file formats.

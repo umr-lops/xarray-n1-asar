@@ -44,7 +44,9 @@ dev = [
     "coverage",  # testing
     "mypy",  # linting
     "pytest",  # testing
-    "ruff"  # linting
+    "pytest-cov",  # testing coverage
+    "ruff",  # linting
+    "cartopy",  # plotting (used by figures_wvi_1p)
 ]
 
 [project.urls]
@@ -70,7 +72,7 @@ fallback_version = "999"
 line-length = 100
 
 [tool.coverage.run]
-source = ["ceos_alos2"]
+source = ["n1_asar"]
 branch = true
 
 
