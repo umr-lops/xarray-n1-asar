@@ -1,5 +1,5 @@
 [project]
-name = "xarray-safe-asar"
+name = "xarray-n1-asar"
 description = "Python lib to read ASAR SLC product from ENVISAT mission (2002-2012)."
 readme = "README.md"
 authors = [
@@ -49,9 +49,9 @@ dev = [
 
 [project.urls]
 
-bugs = "https://github.com/umr-lops/xarray-safe-asar/issues"
-changelog = "https://github.com/umr-lops/xarray-safe-asar/blob/master/changelog.md"
-homepage = "https://github.com/umr-lops/xarray-safe-asar"
+bugs = "https://github.com/umr-lops/xarray-n1-asar/issues"
+changelog = "https://github.com/umr-lops/xarray-n1-asar/blob/master/changelog.md"
+homepage = "https://github.com/umr-lops/xarray-n1-asar"
 
 [build-system]
 requires = ["setuptools>=64.0", "setuptools-scm"]

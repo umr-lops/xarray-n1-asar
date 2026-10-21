@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use xarray-safe-asar in a project::
+To use xarray-n1-asar in a project::
 
     import n1_asar

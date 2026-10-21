@@ -1,4 +1,4 @@
-* xarray-safe-asar version:
+* xarray-n1-asar version:
 * Python version:
 * Operating System:
 

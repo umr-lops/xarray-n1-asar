@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/umr-lops/xarray-safe-asar/issues.
+Report bugs at https://github.com/umr-lops/xarray-n1-asar/issues.
 
 If you are reporting a bug, please include:
 
@@ -38,14 +38,14 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-xarray-safe-asar could always use more documentation, whether as part of the
-official xarray-safe-asar docs, in docstrings, or even on the web in blog posts,
+xarray-n1-asar could always use more documentation, whether as part of the
+official xarray-n1-asar docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/umr-lops/xarray-safe-asar/issues.
+The best way to send feedback is to file an issue at https://github.com/umr-lops/xarray-n1-asar/issues.
 
 If you are proposing a feature:
 
