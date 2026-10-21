@@ -43,6 +43,7 @@ dependencies = [
 dev = [
     "coverage",  # testing
     "mypy",  # linting
+    "pandas-stubs",  # mypy stubs (pandas has no py.typed)
     "pytest",  # testing
     "pytest-cov",  # testing coverage
     "ruff",  # linting
@@ -92,5 +93,4 @@ warn_no_return = true
 module = "tests.*"
 allow_untyped_defs = true
 disable_error_code = "attr-defined"
-known_first_party = "n1_asar"
 

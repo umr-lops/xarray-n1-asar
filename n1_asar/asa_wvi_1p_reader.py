@@ -1,5 +1,8 @@
-import struct
+from datetime import datetime
+
 import numpy as np
+import struct
+
 import xarray as xr
 
 from n1_asar.asa_wv_reader import ASA_WV_Reader
@@ -23,7 +26,7 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
         reader = ASA_WVI_1P_Reader('ASA_WVI_1PNPDK20040728_185756_000000902029_00027_12606_1040.N1:WV_001')
     """ 
 
-    def get_datatree(self, idx):
+    def get_datatree(self, idx: int) -> xr.DataTree:
         """
         Constructs a datatree corresponding to the given imagette index.
 
@@ -59,7 +62,7 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
         return datatree
 
 
-    def set_attributes(self, datatree):
+    def set_attributes(self, datatree: xr.DataTree) -> None:
         """
         Sets attributes on the given DataTree object from SPH (see read_sph) and MPH (see read_mph).
 
@@ -73,7 +76,7 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
             datatree.attrs[key.lower()] = self.sph[key]
 
     
-    def read_line(self, line, fmt):
+    def read_line(self, line: bytes, fmt: str) -> tuple[datetime, int, int, np.ndarray]:
         """
         Reads and parses a line of imagette data using a specified format.
 
@@ -97,9 +100,9 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
         return date, quality_indicator, range_line_number, sar_data
 
     
-    def read_imagette_mds(self, idx):
+    def read_imagette_mds(self, idx: int) -> xr.Dataset:
         """
-        Reads the SLC Imagette Measurement Data Set (MDS) for the given index. 
+        Reads the SLC Imagette Measurement Data Set (MDS) for the given index.
 
         Args:
             idx (int): Imagette index.
@@ -121,11 +124,15 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
         fmt = '>iii b L {}h'.format((dsr_size-header_length)//2)
         measurement = np.zeros((num_dsr, (dsr_size-header_length)//4), dtype=np.complex128)
     
-        dates, quality_indicators, range_lines_numbers = [], [], []
+        dates: list[datetime] = []
+        quality_indicators: list[int] = []
+        range_lines_numbers: list[int] = []
         for i in range(num_dsr):
             line = imagette_mds[i*dsr_size:(i+1)*dsr_size]
             d, qi, rln, sar_data = self.read_line(line, fmt)
-            dates.append(d), quality_indicators.append(qi), range_lines_numbers.append(rln)
+            dates.append(d)
+            quality_indicators.append(qi)
+            range_lines_numbers.append(rln)
             measurement[i] = sar_data
 
         imagette_ds = xr.Dataset(
@@ -164,9 +171,9 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
         return imagette_ds
 
 
-    def read_cross_spectra_mds(self, idx):
+    def read_cross_spectra_mds(self, idx: int) -> xr.Dataset:
         """
-        Reads the Cross Spectra Measurement Data Set (MDS) for the given index. 
+        Reads the Cross Spectra Measurement Data Set (MDS) for the given index.
 
         Args:
             idx (int): Imagette index.

@@ -57,6 +57,8 @@ def test_datatree_index_suffix(wvw_2p_file):
 
     r = ASA_WVW_2P_Reader(wvw_2p_file + ":WV_001")
     try:
-        assert "ocean_wave_spectra" in r.datatree.children
+        dt = r.datatree
+        assert dt is not None
+        assert "ocean_wave_spectra" in dt.children
     finally:
         r.file.close()
