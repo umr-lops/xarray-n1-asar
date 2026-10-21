@@ -1,0 +1,47 @@
+name: Publish
+
+# Publish to PyPI on CalVer tag pushes (e.g. 2026.10.21).
+# TestPyPI dry runs: push a tag like 2026.10.21-test.
+on:
+  push:
+    tags:
+      - "20*.*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      # Required for PyPI trusted publishing (OIDC token exchange).
+      id-token: write
+
+    steps:
+      # fetch-depth: 0 so setuptools-scm can read the pushed tag for the version.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install build
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Show built artifacts
+        run: ls -l dist/
+
+      - name: Publish to TestPyPI
+        if: "endsWith(github.ref_name, '-test')"
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+      - name: Publish to PyPI
+        if: "!endsWith(github.ref_name, '-test')"
+        uses: pypa/gh-action-pypi-publish@release/v1

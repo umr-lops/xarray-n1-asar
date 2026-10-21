@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'xarray-safe-asar'
+project = 'xarray-n1-asar'
 copyright = "2024, Antoine GROUAZEL"
 author = "Antoine GROUAZEL"
 
@@ -128,7 +128,7 @@ latex_elements = {
 # [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'n1_asar.tex',
-     'xarray-safe-asar Documentation',
+     'xarray-n1-asar Documentation',
      'Antoine GROUAZEL', 'manual'),
 ]
 
@@ -139,7 +139,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'n1_asar',
-     'xarray-safe-asar Documentation',
+     'xarray-n1-asar Documentation',
      [author], 1)
 ]
 
@@ -151,7 +151,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'n1_asar',
-     'xarray-safe-asar Documentation',
+     'xarray-n1-asar Documentation',
      author,
      'n1_asar',
      'One line description of project.',
