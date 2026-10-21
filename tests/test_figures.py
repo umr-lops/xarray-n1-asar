@@ -1,4 +1,5 @@
 """Tests for the plotting helpers in figures_wvi_1p."""
+
 import numpy as np
 import xarray as xr
 

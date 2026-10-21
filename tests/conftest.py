@@ -12,6 +12,7 @@ Field layouts were validated against real products:
 - struct sizes: geo=25, sq=252, cross=1061, ocean wave=1061,
   processing params=3959, imagette line=2021
 """
+
 from __future__ import annotations
 
 import re
@@ -386,7 +387,9 @@ def _dsd(name: str, offset: int, size: int, num_dsr: int, dsr_size: int) -> byte
     return bytes(b)
 
 
-def _assemble(mph: bytes, sph: bytes, dsds: list[bytes], payloads: dict[int, bytes], total_size: int) -> bytes:
+def _assemble(
+    mph: bytes, sph: bytes, dsds: list[bytes], payloads: dict[int, bytes], total_size: int
+) -> bytes:
     buf = bytearray(total_size)
     buf[0:MPH_SIZE] = mph
     buf[MPH_SIZE : MPH_SIZE + SPH_SIZE] = sph
