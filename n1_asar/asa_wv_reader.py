@@ -26,29 +26,30 @@ class ASA_WV_Reader:
         datatree (xr.DataTree or None): The DataTree object corresponding to the imagette index, if provided.
 
     """
-    def __init__(self, path):
-        
+    def __init__(self, path: str) -> None:
+
         if ':WV_' in path:
             path, tail = path.rsplit(':WV_', maxsplit=1)
         else:
             path, tail = path, None
-    
+
         self.file = open(path, 'rb')
-        
+
         self.mph = self.read_mph()
-        self.sph = self.read_sph()    
+        self.sph = self.read_sph()
         self.dsd_df = self.get_dsd_dataframe()
         self.geolocation_ads_df = self.read_geolocation_ads()
+        self.datatree: xr.DataTree | None = None
 
         if tail:
             self.datatree = self.get_datatree(int(tail))
 
-    
-    def get_datatree(self, idx):
-        pass
+
+    def get_datatree(self, idx: int) -> xr.DataTree:
+        raise NotImplementedError
 
         
-    def set_attributes(self, datatree):
+    def set_attributes(self, datatree: xr.DataTree) -> None:
         """
         Sets attributes on the given DataTree object from SPH (see read_sph) and MPH (see read_mph).
         
@@ -62,7 +63,7 @@ class ASA_WV_Reader:
             datatree.attrs[key.lower()] = self.sph[key]
 
         
-    def read_mph(self):
+    def read_mph(self) -> dict[str, str]:
         """
         Reads the Main Product Header (MPH).
 
@@ -112,13 +113,13 @@ class ASA_WV_Reader:
         return mph_dict
 
 
-    def read_sph(self):
+    def read_sph(self) -> dict[str, str]:
         """
         Reads the Specific Product Header (SPH).
 
         Returns:
             dict: A dictionary containing all the fields available in the SPH.
-        """        
+        """
         self.file.seek(1247)
         raw_sph = self.file.read(901)
 
@@ -157,7 +158,7 @@ class ASA_WV_Reader:
         return sph_dict
 
         
-    def read_dsd(self, raw_dsd):
+    def read_dsd(self, raw_dsd: bytes) -> dict[str, str]:
         """
         Reads the Data Set Descriptor (DSD) corresponding to the raw data given as input.
 
@@ -180,7 +181,7 @@ class ASA_WV_Reader:
         return dsd_dict
     
     
-    def get_dsd_dataframe(self):
+    def get_dsd_dataframe(self) -> pd.DataFrame:
         """
         Reads all the Data Set Descriptor (DSD) that are present in the given file and set them in a dataframe.
             
@@ -200,7 +201,7 @@ class ASA_WV_Reader:
         return pd.DataFrame(dsd_list)
 
 
-    def get_geolocation_ads_from_idx(self, idx):
+    def get_geolocation_ads_from_idx(self, idx: int) -> xr.Dataset:
         """
         Constructs a dataset containing the geolocation Annotation Data Set corresponding to the given imagette index.
 
@@ -255,7 +256,7 @@ class ASA_WV_Reader:
         return geolocation_ads_ds
     
     
-    def read_geolocation_ads(self):
+    def read_geolocation_ads(self) -> pd.DataFrame:
         """
         Reads all the geolocation Annotation Data Set (ADS) that are present in the given file and set them in a dataframe.
             
@@ -285,7 +286,7 @@ class ASA_WV_Reader:
         return pd.DataFrame(results)
 
     
-    def convert_mjd(self, mjd_tuple):
+    def convert_mjd(self, mjd_tuple: tuple[int, int, int]) -> datetime:
         """
         Converts a Modified Julian Date (MJD) tuple to a datetime object.
 
@@ -302,7 +303,7 @@ class ASA_WV_Reader:
         return date
         
 
-    def read_sq_ads(self, idx):
+    def read_sq_ads(self, idx: int) -> xr.Dataset:
         """
         Reads the Summary Quality Annotation Data Set (SQ ADS) for the given index.
         The SQ ADS contains a summary of parameters used to establish the quality of the product.
@@ -628,9 +629,9 @@ class ASA_WV_Reader:
         return sq_ads_ds
 
 
-    def read_processing_parameters_ads(self, idx):
+    def read_processing_parameters_ads(self, idx: int) -> xr.DataTree:
         """
-        Reads the Processing Parameters Annotation Data Set (ADS) for the given index. 
+        Reads the Processing Parameters Annotation Data Set (ADS) for the given index.
         
         Args:
             idx (int): Imagette index.

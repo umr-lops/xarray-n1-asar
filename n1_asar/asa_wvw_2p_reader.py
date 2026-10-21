@@ -23,7 +23,7 @@ class ASA_WVW_2P_Reader(ASA_WV_Reader):
         reader = ASA_WVW_2P_Reader('ASA_WVW_2PPIFR20110110_001927_000000593098_00203_46338_0844.N1:WV_000')
     """ 
 
-    def get_datatree(self, idx):
+    def get_datatree(self, idx: int) -> xr.DataTree:
         """
         Constructs a datatree corresponding to the given imagette index.
 
@@ -57,9 +57,9 @@ class ASA_WVW_2P_Reader(ASA_WV_Reader):
         return datatree
 
     
-    def read_ocean_wave_spectra_mds(self, idx):
+    def read_ocean_wave_spectra_mds(self, idx: int) -> xr.Dataset:
         """
-        """   
+        """
         row = self.dsd_df[self.dsd_df['DS_NAME'].str.contains('OCEAN WAVE SPECTRA MDS')]
     
         offset = int(row.DS_OFFSET.item()[:-7])

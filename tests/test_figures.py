@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 
 
-def _fake_cross_spectra():
+def _fake_cross_spectra() -> xr.Dataset:
     rng = np.random.default_rng(0)
     real = rng.integers(0, 256, size=(18, 24)).astype(np.uint8)
     imag = rng.integers(0, 256, size=(18, 24)).astype(np.uint8)

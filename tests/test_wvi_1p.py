@@ -158,8 +158,10 @@ def test_get_datatree_structure(wvi_1p_reader):
 def test_datatree_index_suffix(wvi_1p_file):
     r = ASA_WVI_1P_Reader(wvi_1p_file + ":WV_003")
     try:
-        assert "imagette" in r.datatree.children
-        assert r.datatree.attrs["platform"] == "ENVISAT"
+        dt = r.datatree
+        assert dt is not None
+        assert "imagette" in dt.children
+        assert dt.attrs["platform"] == "ENVISAT"
     finally:
         r.file.close()
 

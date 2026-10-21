@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.1
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.4.0
+    hooks:
+      # mypy type-checks n1_asar, which imports xarray/numpy/pandas/matplotlib/
+      # cartopy, so the isolated hook env needs those to resolve their types.
+      # pandas has no py.typed -> pandas-stubs.
+      - id: mypy
+        args: []
+        additional_dependencies:
+          - xarray
+          - numpy
+          - pandas
+          - pandas-stubs
+          - matplotlib
+          - cartopy
+          - pytest

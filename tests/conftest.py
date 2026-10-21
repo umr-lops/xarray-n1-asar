@@ -12,11 +12,19 @@ Field layouts were validated against real products:
 - struct sizes: geo=25, sq=252, cross=1061, ocean wave=1061,
   processing params=3959, imagette line=2021
 """
+from __future__ import annotations
+
 import re
 import struct
+from typing import TYPE_CHECKING, Any, Iterator
 
 import matplotlib
 import pytest
+import xarray as xr
+
+if TYPE_CHECKING:
+    from n1_asar.asa_wvi_1p_reader import ASA_WVI_1P_Reader
+    from n1_asar.asa_wvw_2p_reader import ASA_WVW_2P_Reader
 
 matplotlib.use("Agg")
 
@@ -55,25 +63,25 @@ assert (GEO_DSR_SIZE, SQ_DSR_SIZE, CROSS_DSR_SIZE, OWS_DSR_SIZE, PP_DSR_SIZE) ==
 )
 
 
-def _num20(v):
+def _num20(v: int) -> bytes:
     """DSD offset/size field: 28 bytes."""
     return ("+" + str(v).zfill(20) + "<bytes>").encode()
 
 
-def _num11(v):
+def _num11(v: int) -> bytes:
     """DSD num_dsr / MPH num fields: 11 bytes."""
     return ("+" + str(v).zfill(10)).encode()
 
 
-def _num18(v):
+def _num18(v: int) -> bytes:
     """DSD dsr_size / MPH dsd_size fields: 18 bytes."""
     return ("+" + str(v).zfill(10) + "<bytes>").encode()
 
 
-def _value_map(fmt):
+def _value_map(fmt: str) -> list[tuple[int, str]]:
     """Return a list of (byte_offset, typechar) for each unpacked value."""
     body = fmt[1:]  # drop '>'
-    result = []
+    result: list[tuple[int, str]] = []
     off = 0
     i = 0
     while i < len(body):
@@ -83,6 +91,7 @@ def _value_map(fmt):
             continue
         if ch.isdigit():
             m = re.match(r"\d+", body[i:])
+            assert m is not None
             count = int(m.group())
             i += len(m.group())
             ch = body[i]
@@ -100,7 +109,7 @@ def _value_map(fmt):
     return result
 
 
-def _build_block(fmt, values):
+def _build_block(fmt: str, values: dict[int, Any]) -> bytes:
     """Build a binary block, setting fields by unpacked-value index.
 
     ``values`` maps an unpacked-value index to a Python value. For 'c' fields
@@ -117,12 +126,12 @@ def _build_block(fmt, values):
     return bytes(buf)
 
 
-def _mjd_values(i):
-    """MJD triple for row i, as a dict of unpacked indices -> ints."""
+def _mjd_values(i: int) -> dict[int, float]:
+    """MJD triple for row i, as a dict of unpacked indices -> numeric values."""
     return {0: MJD[0], 1: MJD[1] + i, 2: MJD[2]}
 
 
-def _geo_block(num_rows):
+def _geo_block(num_rows: int) -> bytes:
     out = b""
     for i in range(num_rows):
         out += _build_block(
@@ -138,7 +147,7 @@ def _geo_block(num_rows):
     return out
 
 
-def _sq_block(num_rows):
+def _sq_block(num_rows: int) -> bytes:
     out = b""
     for i in range(num_rows):
         vals = _mjd_values(i)
@@ -163,7 +172,7 @@ def _sq_block(num_rows):
     return out
 
 
-def _cross_block(num_rows):
+def _cross_block(num_rows: int) -> bytes:
     out = b""
     for i in range(num_rows):
         vals = _mjd_values(i)
@@ -186,7 +195,7 @@ def _cross_block(num_rows):
     return out
 
 
-def _ows_block(num_rows):
+def _ows_block(num_rows: int) -> bytes:
     out = b""
     for i in range(num_rows):
         vals = _mjd_values(i)
@@ -213,7 +222,7 @@ def _ows_block(num_rows):
     return out
 
 
-def _pp_record(i):
+def _pp_record(i: int) -> bytes:
     vals = _mjd_values(i)
     vals[4] = MJD[0]
     vals[5] = MJD[1] + i + 1
@@ -281,11 +290,11 @@ def _pp_record(i):
     return _build_block(PP_FMT, vals)
 
 
-def _pp_block(num_rows):
+def _pp_block(num_rows: int) -> bytes:
     return b"".join(_pp_record(i) for i in range(num_rows))
 
 
-def _imagette_block(num_lines, first_line=1):
+def _imagette_block(num_lines: int, first_line: int = 1) -> bytes:
     out = b""
     for j in range(num_lines):
         vals = {0: MJD[0], 1: MJD[1] + j, 2: MJD[2], 3: 0, 4: first_line + j}
@@ -295,10 +304,10 @@ def _imagette_block(num_lines, first_line=1):
     return out
 
 
-def _mph(product, num_dsd, total_size):
+def _mph(product: str, num_dsd: int, total_size: int) -> bytes:
     b = bytearray(b" " * MPH_SIZE)
 
-    def put(start, text):
+    def put(start: int, text: str) -> None:
         b[start : start + len(text)] = text.encode()
 
     put(9, product.ljust(62))
@@ -327,10 +336,10 @@ def _mph(product, num_dsd, total_size):
     return bytes(b)
 
 
-def _sph():
+def _sph() -> bytes:
     b = bytearray(b" " * SPH_SIZE)
 
-    def put(start, text):
+    def put(start: int, text: str) -> None:
         b[start : start + len(text)] = text.encode()
 
     put(16, "SYNTH-SPH")
@@ -365,7 +374,7 @@ def _sph():
     return bytes(b)
 
 
-def _dsd(name, offset, size, num_dsr, dsr_size):
+def _dsd(name: str, offset: int, size: int, num_dsr: int, dsr_size: int) -> bytes:
     b = bytearray(b" " * DSD_SIZE)
     b[9 : 9 + len(name)] = name.encode()
     b[47:48] = b"R"
@@ -377,7 +386,7 @@ def _dsd(name, offset, size, num_dsr, dsr_size):
     return bytes(b)
 
 
-def _assemble(mph, sph, dsds, payloads, total_size):
+def _assemble(mph: bytes, sph: bytes, dsds: list[bytes], payloads: dict[int, bytes], total_size: int) -> bytes:
     buf = bytearray(total_size)
     buf[0:MPH_SIZE] = mph
     buf[MPH_SIZE : MPH_SIZE + SPH_SIZE] = sph
@@ -389,7 +398,7 @@ def _assemble(mph, sph, dsds, payloads, total_size):
     return bytes(buf)
 
 
-def build_wvi_1p(num_imagettes=NUM_IMAGETTES, num_lines=NUM_LINES):
+def build_wvi_1p(num_imagettes: int = NUM_IMAGETTES, num_lines: int = NUM_LINES) -> bytes:
     sq_off, geo_off, pp_off, cross_off = 10000, 20000, 30000, 50000
     imag_offsets = [60000 + 10000 * i for i in range(num_imagettes)]
     payloads = {
@@ -441,7 +450,7 @@ def build_wvi_1p(num_imagettes=NUM_IMAGETTES, num_lines=NUM_LINES):
     return _assemble(mph, _sph(), dsds, payloads, total)
 
 
-def build_wvw_2p(num_imagettes=NUM_IMAGETTES):
+def build_wvw_2p(num_imagettes: int = NUM_IMAGETTES) -> bytes:
     sq_off, geo_off, pp_off, ows_off = 10000, 20000, 30000, 50000
     payloads = {
         sq_off: _sq_block(num_imagettes),
@@ -481,21 +490,21 @@ def build_wvw_2p(num_imagettes=NUM_IMAGETTES):
 
 
 @pytest.fixture(scope="session")
-def wvi_1p_file(tmp_path_factory):
+def wvi_1p_file(tmp_path_factory: pytest.TempPathFactory) -> str:
     p = tmp_path_factory.mktemp("asar") / "SYNTH_WVI_1P.N1"
     p.write_bytes(build_wvi_1p())
     return str(p)
 
 
 @pytest.fixture(scope="session")
-def wvw_2p_file(tmp_path_factory):
+def wvw_2p_file(tmp_path_factory: pytest.TempPathFactory) -> str:
     p = tmp_path_factory.mktemp("asar") / "SYNTH_WVW_2P.N1"
     p.write_bytes(build_wvw_2p())
     return str(p)
 
 
 @pytest.fixture()
-def wvi_1p_reader(wvi_1p_file):
+def wvi_1p_reader(wvi_1p_file: str) -> "Iterator[ASA_WVI_1P_Reader]":
     from n1_asar.asa_wvi_1p_reader import ASA_WVI_1P_Reader
 
     r = ASA_WVI_1P_Reader(wvi_1p_file)
@@ -504,7 +513,7 @@ def wvi_1p_reader(wvi_1p_file):
 
 
 @pytest.fixture()
-def wvw_2p_reader(wvw_2p_file):
+def wvw_2p_reader(wvw_2p_file: str) -> "Iterator[ASA_WVW_2P_Reader]":
     from n1_asar.asa_wvw_2p_reader import ASA_WVW_2P_Reader
 
     r = ASA_WVW_2P_Reader(wvw_2p_file)
@@ -513,5 +522,5 @@ def wvw_2p_reader(wvw_2p_file):
 
 
 @pytest.fixture()
-def wvi_1p_datatree(wvi_1p_reader):
+def wvi_1p_datatree(wvi_1p_reader: ASA_WVI_1P_Reader) -> xr.DataTree:
     return wvi_1p_reader.get_datatree(0)

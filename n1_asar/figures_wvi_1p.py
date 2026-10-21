@@ -1,11 +1,23 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
+import cartopy.crs as ccrs  # type: ignore[import-untyped]
 
 from matplotlib.colors import ListedColormap
 
-def display_cross_spectra(asa_wvi_1p_dt, kmin=2*np.pi/1000, kmax=0.07, savepath=None):
+if TYPE_CHECKING:
+    from n1_asar.asa_wvi_1p_reader import ASA_WVI_1P_Reader
+
+def display_cross_spectra(
+    asa_wvi_1p_dt: xr.DataTree,
+    kmin: float = 2*np.pi/1000,
+    kmax: float = 0.07,
+    savepath: str | None = None,
+) -> None:
     """
     Displays cross spectra (real and imaginary) from a given dataset.
 
@@ -40,7 +52,7 @@ def display_cross_spectra(asa_wvi_1p_dt, kmin=2*np.pi/1000, kmax=0.07, savepath=
     plasma_bright = ListedColormap(np.clip(plt.cm.plasma(np.linspace(0.15, 1, 256)), 0.0, 1.0))
     
     # Plot real spectra on the first subplot
-    c0 = full_spectra.real.plot(ax=axes[0], cmap=plasma_bright, y='wavenumber',
+    c0 = full_spectra.real.plot(ax=axes[0], cmap=plasma_bright, y='wavenumber',  # type: ignore[call-arg]
                                 vmin=full_spectra.real.min(), vmax=full_spectra.real.max(),
                                 add_colorbar=False)
     axes[0].set_title("Real Spectrum", fontsize=12)
@@ -57,7 +69,7 @@ def display_cross_spectra(asa_wvi_1p_dt, kmin=2*np.pi/1000, kmax=0.07, savepath=
     cbar0.ax.tick_params(labelsize=10)
 
     # Plot imaginary spectra on the second subplot
-    c1 = full_spectra.imag.plot(ax=axes[1], cmap='PuOr', y='wavenumber',
+    c1 = full_spectra.imag.plot(ax=axes[1], cmap='PuOr', y='wavenumber',  # type: ignore[call-arg]
                                 vmin=full_spectra.imag.min(), vmax=full_spectra.imag.max(),
                                 add_colorbar=False)
     axes[1].set_title("Imaginary Spectrum", fontsize=12)
@@ -88,7 +100,10 @@ def display_cross_spectra(asa_wvi_1p_dt, kmin=2*np.pi/1000, kmax=0.07, savepath=
         plt.show()
 
 
-def display_digital_numbers(asa_wvi_1p_dt, savepath=None):
+def display_digital_numbers(
+    asa_wvi_1p_dt: xr.DataTree,
+    savepath: str | None = None,
+) -> None:
     """
     Displays digital numbers from a given dataset.
 
@@ -99,15 +114,17 @@ def display_digital_numbers(asa_wvi_1p_dt, savepath=None):
     Returns:
         None
     """
-    DN = np.log10(np.abs(asa_wvi_1p_dt['imagette']['measurement_real'] + 1j*asa_wvi_1p_dt['imagette']['measurement_imag'])**2)
-    DN = DN.assign_coords(range_ = DN['sample']*asa_wvi_1p_dt['processing_parameters/main_parameters'].ds['ground_res'])
-    DN = DN.assign_coords(azimuth_ = DN['line']*asa_wvi_1p_dt['processing_parameters/main_parameters'].ds['imagette_az_res'])
+    imagette_ds = asa_wvi_1p_dt['imagette'].ds
+    main_ds = asa_wvi_1p_dt['processing_parameters/main_parameters'].ds
+    DN = xr.DataArray(np.log10(np.abs(imagette_ds['measurement_real'] + 1j*imagette_ds['measurement_imag'])**2))
+    DN = DN.assign_coords(range_ = DN['sample']*main_ds['ground_res'])
+    DN = DN.assign_coords(azimuth_ = DN['line']*main_ds['imagette_az_res'])
 
     # Enable constrained layout to automatically adjust colorbar size
     fig, ax = plt.subplots()
     
     # Plot data without colorbar
-    c = DN.plot(ax=ax, cmap='gray', vmin=0, x='range_', y='azimuth_', add_colorbar=False)
+    c = DN.plot(ax=ax, cmap='gray', vmin=0, x='range_', y='azimuth_', add_colorbar=False)  # type: ignore[call-arg]
     
     # Set labels and aspect ratio
     ax.set_xlabel('ground range (m)')
@@ -115,7 +132,9 @@ def display_digital_numbers(asa_wvi_1p_dt, savepath=None):
     plt.axis('scaled')
 
     # Add colorbar
-    cax = fig.add_axes([ax.get_position().x1+0.01,ax.get_position().y0, 0.02, ax.get_position().height])
+    pos = ax.get_position()
+    cax_rect = (float(pos.x1) + 0.01, float(pos.y0), 0.02, float(pos.height))
+    cax = fig.add_axes(cax_rect)
     plt.colorbar(c, cax=cax, label=r'$log_{10}(|DN|^2)$')
     
     if savepath:
@@ -125,7 +144,12 @@ def display_digital_numbers(asa_wvi_1p_dt, savepath=None):
         plt.show()
 
 
-def display_map(reader, i, dx=10, savepath=None):
+def display_map(
+    reader: ASA_WVI_1P_Reader,
+    i: int,
+    dx: float = 10,
+    savepath: str | None = None,
+) -> None:
     """
     Displays a map with two subplots: a global view and a zoomed-in view around a specified point of interest.
 
@@ -167,7 +191,7 @@ def display_map(reader, i, dx=10, savepath=None):
         plt.show()
 
 
-def get_polar_spectra(asa_cross_spectra):
+def get_polar_spectra(asa_cross_spectra: xr.Dataset) -> xr.DataArray:
     """
     Convert and rescale real and imaginary parts of cross-spectra to a complex polar spectrum.
     
@@ -184,7 +208,7 @@ def get_polar_spectra(asa_cross_spectra):
     return spectra
 
 
-def symmetrize_polar_spectra(spectra):
+def symmetrize_polar_spectra(spectra: xr.DataArray) -> xr.DataArray:
     """
     Symmetrize a polar spectrum by adding its complex conjugate at a 180° phase shift.
     
@@ -194,8 +218,7 @@ def symmetrize_polar_spectra(spectra):
     Returns:
         xarray.DataArray: The symmetrized polar spectrum.
     """
-    sym_spectra = spectra.copy()
-    sym_spectra = np.conj(sym_spectra.assign_coords(direction = spectra.direction + np.pi))
+    sym_spectra = spectra.assign_coords(direction=spectra.direction + np.pi).conj()
     full_spectra = xr.concat([spectra, sym_spectra], dim='direction')
-    
+
     return full_spectra
