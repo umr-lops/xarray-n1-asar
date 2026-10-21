@@ -265,10 +265,9 @@ class ASA_WV_Reader:
         row = self.dsd_df[self.dsd_df['DS_NAME'].str.contains('GEOLOCATION ADS')]
         
         offset = int(row.DS_OFFSET.item()[:-7])
-        size = int(row.DS_SIZE.item()[:-7])
         num_dsr = int(row.NUM_DSR.item())
         dsr_size = int(row.DSR_SIZE.item()[:-7])
-        
+
         self.file.seek(offset)
         raw_geolocation_ads = self.file.read(num_dsr * dsr_size)
         
@@ -317,10 +316,8 @@ class ASA_WV_Reader:
         row = self.dsd_df[self.dsd_df['DS_NAME'].str.contains('SQ ADS')]
 
         offset = int(row.DS_OFFSET.item()[:-7])
-        size = int(row.DS_SIZE.item()[:-7])
-        num_dsr = int(row.NUM_DSR.item())
         dsr_size = int(row.DSR_SIZE.item()[:-7])
-        
+
         self.file.seek(offset + idx*dsr_size)
         raw_sq_ads = self.file.read(dsr_size)
 
@@ -644,10 +641,8 @@ class ASA_WV_Reader:
         row = self.dsd_df[self.dsd_df['DS_NAME'].str.contains('PROCESSING PARAMS ADS')]
 
         offset = int(row.DS_OFFSET.item()[:-7])
-        size = int(row.DS_SIZE.item()[:-7])
-        num_dsr = int(row.NUM_DSR.item())
         dsr_size = int(row.DSR_SIZE.item()[:-7])
-        
+
         self.file.seek(offset + idx*dsr_size)
         raw_processing_parameters_ads = self.file.read(dsr_size)
         data = struct.unpack((">3i ? 3i 12c f 3c 3f 2L 5c L f 43x 15? 6x 4L 14f 4? 4f 92x 32x 2L 3i 20x 60h 60x"
