@@ -63,16 +63,12 @@ class ASA_WVW_2P_Reader(ASA_WV_Reader):
         row = self.dsd_df[self.dsd_df['DS_NAME'].str.contains('OCEAN WAVE SPECTRA MDS')]
     
         offset = int(row.DS_OFFSET.item()[:-7])
-        size = int(row.DS_SIZE.item()[:-7])
-        num_dsr = int(row.NUM_DSR.item())
         dsr_size = int(row.DSR_SIZE.item()[:-7])
-        
+
         self.file.seek(offset + idx*dsr_size)
         raw_ocean_wave_spectra_mds = self.file.read(dsr_size)
         data = struct.unpack((">3i ? 2f 4x 9f 56x 2f 8x 6f H 3f H 24x 432B 432B"), raw_ocean_wave_spectra_mds)
-        real_spectra = np.array(data[28: 460]).reshape((18,24))
-        imag_spectra = np.array(data[460:]).reshape((18,24))
-        
+
         ocean_wave_spectra_ds = xr.Dataset(
             data_vars={
                     'quality_flag': ([], data[3], 

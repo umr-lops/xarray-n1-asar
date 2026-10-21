@@ -177,10 +177,8 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
         row = self.dsd_df[self.dsd_df['DS_NAME'].str.contains('CROSS SPECTRA MDS')]
 
         offset = int(row.DS_OFFSET.item()[:-7])
-        size = int(row.DS_SIZE.item()[:-7])
-        num_dsr = int(row.NUM_DSR.item())
         dsr_size = int(row.DSR_SIZE.item()[:-7])
-        
+
         self.file.seek(offset + idx*dsr_size)
         raw_cross_spectra_mds = self.file.read(dsr_size)
 
