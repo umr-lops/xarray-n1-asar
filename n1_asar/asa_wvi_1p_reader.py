@@ -54,7 +54,7 @@ class ASA_WVI_1P_Reader(ASA_WV_Reader):
 
         datatree = xr.DataTree.from_dict(final_dict)
         self.set_attributes(datatree)
-        datatree.attrs['platform'] = 'ENVISAT'
+        datatree.attrs['platform'] = self.platform
         
         return datatree
 

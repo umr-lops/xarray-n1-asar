@@ -7,6 +7,7 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 
+from pathlib import Path
 from datetime import datetime, timedelta
 
 
@@ -27,14 +28,15 @@ class ASA_WV_Reader:
 
     """
     def __init__(self, path):
-        
+
         if ':WV_' in path:
             path, tail = path.rsplit(':WV_', maxsplit=1)
         else:
             path, tail = path, None
-    
+
+        self.path = path
         self.file = open(path, 'rb')
-        
+        self.platform = self.get_platform()
         self.mph = self.read_mph()
         self.sph = self.read_sph()    
         self.dsd_df = self.get_dsd_dataframe()
@@ -42,6 +44,27 @@ class ASA_WV_Reader:
 
         if tail:
             self.datatree = self.get_datatree(int(tail))
+
+
+    def get_platform(self):
+        """
+        Returns the platform of the product.
+
+        Args:
+            path (str): Path to the product file.
+
+        Returns:
+            str: The platform of the product (e.g., 'Envisat', 'ERS-1', 'ERS-2').
+        """
+        if Path(self.path).suffix == '.N1':
+            platform = 'Envisat'
+        elif Path(self.path).suffix == '.E1':
+            platform = 'ERS-1'
+        elif Path(self.path).suffix == '.E2':
+            platform = 'ERS-2'
+        else:
+            raise ValueError(f"Unsupported file extension: {Path(self.path).suffix}. Supported extensions are .N1, .E1, and .E2.")
+        return platform
 
     
     def get_datatree(self, idx):
