@@ -35,9 +35,3 @@ reader_1p = ASA_WVI_1P_Reader(file)
 file_2p = 'ASA_WVW_2PPIFR20110102_001940_000001053098_00088_46223_8874.N1'
 reader_2p = ASA_WVW_2P_Reader(file)
 ```
-
-
-
-
-
-

@@ -29,6 +29,15 @@ jobs:
         run: |
           pytest --cov=n1_asar --cov-report=xml --cov-report=term
 
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -47,13 +56,8 @@ jobs:
       - name: ruff
         run: ruff check n1_asar tests
 
+      - name: ruff format
+        run: ruff format --check n1_asar tests
+
       - name: mypy
         run: mypy n1_asar tests
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.xml
-          flags: unittests
-          name: codecov-umbrella
